@@ -1,0 +1,82 @@
+server {
+        listen  :80; ## listen for ipv4; this line is default and implied
+        #listen   [::]:80 default_server ipv6only=on; ## listen for ipv6
+        server_name my.example.com;
+        #Forward all unsecure connections to SSL
+        rewrite ^(.*) https://$server_name$1 permanent; 
+}
+
+server {
+        listen  123.456.789.988:443; #SSL Only
+        server_name my.example.com;
+        root /home/myfolder/blesta3/public_html;
+        index index.php index.html index.htm;
+        error_log  /home/myfolder/logs/nginx_error.log  warn;
+        # Turn on SSL
+        ssl on;
+	ssl_certificate /etc/nginx/certs/my_example_com.pem;
+	ssl_certificate_key /etc/nginx/certs/my.example.com.key;
+	keepalive_timeout 75 75; # For SSL
+        
+        # Only for nginx-naxsi used with nginx-naxsi-ui : process denied requests
+        #location /RequestDenied {
+        #       proxy_pass http://127.0.0.1:8080;
+        #}
+
+        #error_page 404 /404.html;
+
+        # redirect server error pages to the static page /50x.html
+        # Set to directory of error files
+        error_page 500 502 503 504 /50x.html;
+        location = /50x.html {
+                root /usr/share/nginx/www;
+        }
+
+        # pass the PHP scripts to PHP FPM
+        #
+location ~ \.php$ {
+                try_files $uri =404;
+                # Tweak for Nginx to work with PHP from vendors
+                fastcgi_split_path_info ^(.+\.php)(/.+)$;
+                # NOTE: You should have "cgi.fix_pathinfo = 0;" in php.ini
+                fastcgi_connect_timeout 60;
+                fastcgi_send_timeout 180;
+                fastcgi_read_timeout 180;
+                # Buffer settings increase to compensate for increased time/size due to SSL
+                fastcgi_buffer_size 128k;
+                fastcgi_buffers 4 256k; #
+                fastcgi_busy_buffers_size 256k; 
+                fastcgi_temp_file_write_size 256k;
+                fastcgi_intercept_errors on;
+                # With php5-cgi alone:
+                #fastcgi_pass 127.0.0.1:9000;
+                # With php5-fpm (recommended)
+                fastcgi_pass unix:/var/run/php5-fpm.sock;
+                fastcgi_index index.php;
+                include fastcgi_params;
+        }
+        
+# Disallow access to any file with .pdt extension        
+location ~ (\.pdt) {
+    return 403;
+}
+
+# Ported from Blesta's .htaccess
+# There are more than one way to accomplish this.
+# You can use try_files rather than using IF ... rewrite; 
+location / {
+  error_page     404 = @blesta; #IF file doesn't exist
+  log_not_found  off;
+# For access to install file  
+if ($request_uri ~ "^(.*)/install.php$"){
+    rewrite install.php /%1/install/ redirect;
+  }
+}
+ 
+#Core rewrite
+location @blesta {
+  rewrite ^(.*)$ /index.php last; 
+}
+
+
+}
