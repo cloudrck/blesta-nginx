@@ -1,12 +1,9 @@
+
 server {
-    listen   1.2.3.4:80 default;
-    #listen   [::]:80; #IPv6
-
-    server_name billing.example.com;
-
-    rewrite ^ https://$server_name$request_uri? permanent
+    listen      80;
+    server_name my.example.com;
+    return 301 https://my.example.com$request_uri;
 }
-
 server {
         listen  123.456.789.988:443 ssl; #SSL Only
         server_name my.example.com;
