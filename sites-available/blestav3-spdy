@@ -1,20 +1,18 @@
  server {
         listen   443 ssl spdy; ## listen for ipv4, nginx 1.8 stable (spdy)
         #listen  443 ssl http2; ## listen for ipv4, nginx 1.9+ mainline (http2)
-        
-        #listen   [::]:80 default ipv6only=on; ## listen for ipv6
 
-        root /srv/www/clientarea.blesta/public_html;
+        root /srv/www/clientarea.example.com/public_html;
 	 index index.php index.html;
-	 error_log /srv/www/clientarea.blesta/logs/clientarea.blesta.error.log warn;
+	 error_log /srv/www/clientarea.example.com/logs/clientarea.example.com.error.log warn;
 
         # Make site accessible from http://localhost/
-        server_name clientarea.blesta;
+        server_name clientarea.example.com;
         
         #If you use letsencrypt ssl
-        ssl_certificate /etc/letsencrypt/live/clientarea.blesta/fullchain.pem;
-        ssl_certificate_key /etc/letsencrypt/live/clientarea.blesta/privkey.pem;
-	    ssl_trusted_certificate /etc/letsencrypt/live/clientarea.blesta/chain.pem;
+        ssl_certificate /etc/letsencrypt/live/clientarea.example.com/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/clientarea.example.com/privkey.pem;
+	    ssl_trusted_certificate /etc/letsencrypt/live/clientarea.example.com/chain.pem;
 
 	    ssl_session_cache shared:SSL:20m;
 	    ssl_session_timeout 10m;
